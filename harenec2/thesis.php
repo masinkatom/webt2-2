@@ -5,7 +5,6 @@ error_reporting(E_ALL);
 
 session_start();
 
-require_once '../config.php';
 ?>
 
 <!DOCTYPE html>
@@ -42,6 +41,24 @@ require_once '../config.php';
     <main class="container">
         <h1>Zoznam bakalárskych prác.</h1>
         <div class="table-nav">
+            <select name="select-department" id="select-department">
+                <option value="642-BP">Ustav automobilovej mechatroniky BP</option>
+                <option value="548-BP">Ustav elektroenergetiky a aplikovanej elektrotechniky BP</option>
+                <option value="549-BP">Ustav elektroniky a fotoniky BP</option>
+                <option value="550-BP">Ustav elektrotechniky BP</option>
+                <option value="816-BP">Ustav informatiky a matematiky BP</option>
+                <option value="817-BP">Ustav jadrového a fyzikálneho inžinierstva BP</option>
+                <option value="818-BP">Ustav multimediálnych informačných a komunikačných technológií BP</option>
+                <option value="356-BP">Ustav robotiky a kybernetiky BP</option>
+                <option value="642-DP">Ustav automobilovej mechatroniky DIP</option>
+                <option value="548-DP">Ustav elektroenergetiky a aplikovanej elektrotechniky DIP</option>
+                <option value="549-DP">Ustav elektroniky a fotoniky DIP</option>
+                <option value="550-DP">Ustav elektrotechniky DIP</option>
+                <option value="816-DP">Ustav informatiky a matematiky DIP</option>
+                <option value="817-DP">Ustav jadrového a fyzikálneho inžinierstva DIP</option>
+                <option value="818-DP">Ustav multimediálnych informačných a komunikačných technológií DIP</option>
+                <option value="356-DP">Ustav robotiky a kybernetiky DIP</option>
+            </select>
             <div class="table-selector">
                 <h4>Počet záznamov na stránku:</h4>
                 <select name="page-length" id="page-length">
@@ -53,34 +70,15 @@ require_once '../config.php';
                 </select>
             </div>
 
-            <div class="table-selector">
-                <h4>Filter podľa roku:</h4>
-                <select name="filter-year" id="filter-year">
-                    <option value="">Vyberte rok</option>
-                    <?php
-                    // $sql = "SELECT DISTINCT year FROM prizes";
-                    // $stmt = $pdo->query($sql);
-
-                    // // Fetch and loop through the data to generate options
-                    // while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    //     echo "<option value='" . $row['year'] . "'>" . $row['year'] . "</option>";
-                    // }
-                    // unset($stmt);
-                    ?>
-                </select>
-            </div>
         </div>
 
         <table id="myTable-thesis" class="table table-striped table-hover" width="100%">
             <thead>
                 <tr>
-                    <th>Deň</th>
-                    <th>Od</th>
-                    <th>Do</th>
-                    <th>Predmet</th>
-                    <th>Akcia</th>
-                    <th>Miestnosť</th>
-                    <th>Vyučujúci</th>
+                    <th>Názov témy</th>
+                    <th>Vedúci práce</th>
+                    <th>Garantujúce pracovisko</th>
+                    <th>Program</th>
                 </tr>
             </thead>
             <tbody>

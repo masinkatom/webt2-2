@@ -16,11 +16,11 @@ function sendRequest($url, $method = 'GET', $data = [])
             break;
         case 'POST':
             curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             break;
         case 'PUT':
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             break;
         case 'DELETE':
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
@@ -29,5 +29,5 @@ function sendRequest($url, $method = 'GET', $data = [])
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    return json_encode(['response' => $response, 'http_code' => $httpCode]);
+    return json_encode(['response' => $response, 'http_code' => $httpCode], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 }

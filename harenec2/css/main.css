@@ -174,7 +174,7 @@ input[type=number],
 input[type=date],
 input[type=password],
 select {
-    width: 40rem;
+    width: 30rem;
     height: 4rem;
     border: 0px solid #ccc;
     -webkit-transition: 0.5s;
@@ -234,8 +234,6 @@ button:hover {
 .modal img {
     max-width: 50rem;
 }
-
-
 
 .success {
     color: var(--webte-color-green);
@@ -347,14 +345,16 @@ button:hover {
     font-size: 1.5rem;
 }
 
+.form-input select {
+    width: 30rem;
+    font-size: 1.7rem;
+}
+
 .form-record {
-    display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     justify-content: space-evenly;
-    border-top: 2px solid var(--webte-color-yellow);
-    margin-top: 2rem;
-    padding-top: 2rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
 }
 
 .modal2 {
@@ -406,6 +406,13 @@ button:hover {
 
 .btn-compact {
     padding: .5rem 1.5rem;
+    height: 5.5rem;
+}
+
+.table-edit {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-top: 2px solid var(--webte-color-yellow);
 }
 
 @media screen and (max-width:470px) {
@@ -420,10 +427,15 @@ button:hover {
         width: 90%;
     }
 
+    .form-input select {
+        width: 90%;
+        font-size: 1.2rem;
+    }
+
     input[type=submit],
     input[type=button],
     button {
-        font-size: 1.8rem;
+        font-size: 1.7rem;
     }
 
 }

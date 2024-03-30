@@ -84,14 +84,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             array_shift($data);
 
-            // Convert data to JSON format
-            // $jsonData = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-
-            // // Output JSON data
-            // // Get JSON data from the request body
-            // $json = file_get_contents('php://input');
-            // $data = json_decode($json, true);
-
         } else {
             echo "Chyba: Nepodarilo sa získať údaje z AIS. HTTP kód: " . $httpCode;
         }
@@ -100,22 +92,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // PRIDANIE DAT DO DB
         try {
-            foreach ($data as $dataRow) {
-                $stmt = $pdo->prepare("INSERT INTO `timetable`(`day`, `time_from`, `time_to`, `subject`, `action`, `room`, `teacher`) 
-                VALUES (:day, :time_from, :time_to, :subject, :action, :room, :teacher)");
-
-                $stmt->bindParam(':day', $dataRow[0]);
-                $stmt->bindParam(':time_from', $dataRow[1]);
-                $stmt->bindParam(':time_to', $dataRow[2]);
-                $stmt->bindParam(':subject', $dataRow[3]);
-                $stmt->bindParam(':action', $dataRow[4]);
-                $stmt->bindParam(':room', $dataRow[5]);
-                $stmt->bindParam(':teacher', $dataRow[6]);
-
-                $stmt->execute();
-                unset($stmt);
-            }
-
+            deleteDataFromDB($pdo);
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+        try {
+            addDataToDB($pdo, $data);
             echo "Dáta boli uložené!";
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
@@ -125,16 +107,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // VYMAZANIE DAT Z DB
     if ($_POST['action'] === "delete") {
         try {
-            $stmt = $pdo->prepare("DELETE FROM timetable");
-            $stmt->execute();
-            unset($stmt);
-            $stmt = $pdo->prepare("ALTER TABLE timetable AUTO_INCREMENT = 1");
-            $stmt->execute();
-            unset($stmt);
+            deleteDataFromDB($pdo);
             echo "Dáta boli vymazané!";
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
         }
     }
+}
+
+function addDataToDB($pdo, $data)
+{
+    foreach ($data as $dataRow) {
+        $stmt = $pdo->prepare("INSERT INTO `timetable`(`day`, `time_from`, `time_to`, `subject`, `action`, `room`, `teacher`) 
+        VALUES (:day, :time_from, :time_to, :subject, :action, :room, :teacher)");
+
+        $dataRow[3] = removeBrackets($dataRow[3]);
+
+        $stmt->bindParam(':day', $dataRow[0]);
+        $stmt->bindParam(':time_from', $dataRow[1]);
+        $stmt->bindParam(':time_to', $dataRow[2]);
+        $stmt->bindParam(':subject', $dataRow[3]);
+        $stmt->bindParam(':action', $dataRow[4]);
+        $stmt->bindParam(':room', $dataRow[5]);
+        $stmt->bindParam(':teacher', $dataRow[6]);
+
+        $stmt->execute();
+        unset($stmt);
+    }
+}
+
+function deleteDataFromDB($pdo)
+{
+    $stmt = $pdo->prepare("DELETE FROM timetable");
+    $stmt->execute();
+    unset($stmt);
+    $stmt = $pdo->prepare("ALTER TABLE timetable AUTO_INCREMENT = 1");
+    $stmt->execute();
+    unset($stmt);
+}
+
+function removeBrackets($text) {
+    return preg_replace('/\(.*?\)/', '', $text);
 }
 
