@@ -1,109 +1,227 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+class Thesis
+{
+    public function __construct()
+    {
+    }
+    public function getAllTheses($departmentId, $thesisType)
+    {
+        $data = [];
 
-session_start();
+        // init curl
+        $ch = curl_init();
+        // URL adresa stránky s osobným rozvrhom AIS
+        $url = "https://is.stuba.sk/pracoviste/prehled_temat.pl?lang=sk;pracoviste=" . $departmentId;
 
-?>
-
-<!DOCTYPE html>
-<html data-bs-theme="dark" lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIS Bakalárske práce</title>
-    <link rel="icon" type="image/x-icon" href="images/dawg.png">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.bootstrap5.css">
-    <link rel="stylesheet" href="css/main.css">
-</head>
-
-<body>
-
-    <div class="container">
-        <nav class="main-nav">
-            <ul class="nav-list">
-                <li class="nav-item">
-                    <a href="index.php">Rozvrh</a>
-                </li>
-                <li class="nav-item">
-                    <a href="thesis.php">Bakalárky</a>
-                </li>
-            </ul>
-        </nav>
-        <form id="fetch" action="getRowData.php" method="POST" style="display: none;">
-            <input type="hidden" name="name" id="input-name">
-        </form>
-    </div>
-    <main class="container">
-        <h1>Zoznam bakalárskych prác.</h1>
-        <div class="table-nav">
-            <select name="select-department" id="select-department">
-                <option value="642-BP">Ustav automobilovej mechatroniky BP</option>
-                <option value="548-BP">Ustav elektroenergetiky a aplikovanej elektrotechniky BP</option>
-                <option value="549-BP">Ustav elektroniky a fotoniky BP</option>
-                <option value="550-BP">Ustav elektrotechniky BP</option>
-                <option value="816-BP">Ustav informatiky a matematiky BP</option>
-                <option value="817-BP">Ustav jadrového a fyzikálneho inžinierstva BP</option>
-                <option value="818-BP">Ustav multimediálnych informačných a komunikačných technológií BP</option>
-                <option value="356-BP">Ustav robotiky a kybernetiky BP</option>
-                <option value="642-DP">Ustav automobilovej mechatroniky DIP</option>
-                <option value="548-DP">Ustav elektroenergetiky a aplikovanej elektrotechniky DIP</option>
-                <option value="549-DP">Ustav elektroniky a fotoniky DIP</option>
-                <option value="550-DP">Ustav elektrotechniky DIP</option>
-                <option value="816-DP">Ustav informatiky a matematiky DIP</option>
-                <option value="817-DP">Ustav jadrového a fyzikálneho inžinierstva DIP</option>
-                <option value="818-DP">Ustav multimediálnych informačných a komunikačných technológií DIP</option>
-                <option value="356-DP">Ustav robotiky a kybernetiky DIP</option>
-            </select>
-            <div class="table-selector">
-                <h4>Počet záznamov na stránku:</h4>
-                <select name="page-length" id="page-length">
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="-1">Všetky</option>
-                </select>
-            </div>
-
-        </div>
-
-        <table id="myTable-thesis" class="table table-striped table-hover" width="100%">
-            <thead>
-                <tr>
-                    <th>Názov témy</th>
-                    <th>Vedúci práce</th>
-                    <th>Garantujúce pracovisko</th>
-                    <th>Program</th>
-                </tr>
-            </thead>
-            <tbody>
-
-            </tbody>
-        </table>
-    </main>
-
-    <div id="modal2" class="modal modal2 hidden">
-        <div class="info-modal">
-            <h2>Laureát.</h2>
-            <div class="modal-data">
-
-            </div>
-            <img id="close-modal" src="images/close-icon.svg" alt="close">
-        </div>
+        // Nastavenie CURL možností
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 
 
-    </div>
+        // If you need to set custom headers, define the $headers array with the appropriate header values
+        $headers = array(
+            'Content-Type: application/xml',
+            // Add more headers if needed
+        );
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/2.0.2/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/2.0.2/js/dataTables.bootstrap5.js"></script>
-    <!-- <script src="js/tableData.js"></script> -->
-</body>
+        // Vykonanie CURL požiadavky
+        $response = curl_exec($ch);
 
-</html>
+        // Kontrola HTTP kódu odpovede
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($httpCode === 200) {
+            $dom = new DOMDocument();
+            @$dom->loadHTML(mb_convert_encoding($response, 'HTML-ENTITIES', 'UTF-8'));
+
+            $form = $dom->getElementsByTagName('form')->item(0);
+            $table = $form->getElementsByTagName('table')->item(3);
+            $rows = $table->getElementsByTagName('tr');
+
+            // Iterate through rows
+            foreach ($rows as $row) {
+                $cells = $row->getElementsByTagName('td');
+                $rowData = [];
+                if ($cells->length > 0) {
+                    if ($cells[1]->nodeValue === $thesisType) {
+                        if ($cells->length == 11) {
+                            $rowData = [
+                                "id" => rtrim($cells[0]->nodeValue, "."),
+                                "type" => $cells[1]->nodeValue,
+                                "topic" => $cells[2]->nodeValue,
+                                "supervisor" => $cells[3]->nodeValue,
+                                "department" => $cells[4]->nodeValue,
+                                "programme" => $cells[5]->nodeValue,
+                                "track" => $cells[6]->nodeValue,
+                                "abstract" => $this->getAbstract("https://is.stuba.sk" . $cells[8]->firstChild->getAttribute('href'))
+                            ];
+                        } elseif ($cells->length == 10) {
+                            $rowData = [
+                                "id" => rtrim($cells[0]->nodeValue, "."),
+                                "type" => $cells[1]->nodeValue,
+                                "topic" => $cells[2]->nodeValue,
+                                "supervisor" => $cells[3]->nodeValue,
+                                "department" => $cells[4]->nodeValue,
+                                "programme" => $cells[5]->nodeValue,
+                                "track" => "",
+                                "abstract" => $this->getAbstract("https://is.stuba.sk" . $cells[7]->firstChild->getAttribute('href'))
+                            ];
+                        }
+                        $data[] = $rowData;
+
+                    }
+                }
+            }
+
+        } else {
+            echo "Chyba: Nepodarilo sa získať údaje z AIS. HTTP kód: " . $httpCode;
+        }
+        // Uzatvorenie CURL spojenia
+        curl_close($ch);
+        return $data;
+    }
+    public function getAllFreeTheses($departmentId, $thesisType)
+    {
+        $data = [];
+
+        // init curl
+        $ch = curl_init();
+        // URL adresa stránky s osobným rozvrhom AIS
+        $url = "https://is.stuba.sk/pracoviste/prehled_temat.pl?lang=sk;pracoviste=" . $departmentId;
+
+        // Nastavenie CURL možností
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+        // If you need to set custom headers, define the $headers array with the appropriate header values
+        $headers = array(
+            'Content-Type: application/xml',
+            // Add more headers if needed
+        );
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        // Vykonanie CURL požiadavky
+        $response = curl_exec($ch);
+
+        // Kontrola HTTP kódu odpovede
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($httpCode === 200) {
+            $dom = new DOMDocument();
+            @$dom->loadHTML(mb_convert_encoding($response, 'HTML-ENTITIES', 'UTF-8'));
+
+            $form = $dom->getElementsByTagName('form')->item(0);
+            $table = $form->getElementsByTagName('table')->item(3);
+            $rows = $table->getElementsByTagName('tr');
+
+            // Iterate through rows
+            foreach ($rows as $row) {
+                $cells = $row->getElementsByTagName('td');
+                $rowData = [];
+                if ($cells->length > 0 && $this->checkForFree($cells[$cells->length - 2]->nodeValue)) {
+                    if ($cells[1]->nodeValue === $thesisType) {
+                        if ($cells->length == 11) {
+                            $rowData = [
+                                "id" => rtrim($cells[0]->nodeValue, "."),
+                                "type" => $cells[1]->nodeValue,
+                                "topic" => $cells[2]->nodeValue,
+                                "supervisor" => $cells[3]->nodeValue,
+                                "department" => $cells[4]->nodeValue,
+                                "programme" => $cells[5]->nodeValue,
+                                "track" => $cells[6]->nodeValue,
+                                "abstract" => $this->getAbstract("https://is.stuba.sk" . $cells[8]->firstChild->getAttribute('href'))
+                            ];
+                        } elseif ($cells->length == 10) {
+                            $rowData = [
+                                "id" => rtrim($cells[0]->nodeValue, "."),
+                                "type" => $cells[1]->nodeValue,
+                                "topic" => $cells[2]->nodeValue,
+                                "supervisor" => $cells[3]->nodeValue,
+                                "department" => $cells[4]->nodeValue,
+                                "programme" => $cells[5]->nodeValue,
+                                "track" => "",
+                                "abstract" => $this->getAbstract("https://is.stuba.sk" . $cells[7]->firstChild->getAttribute('href'))
+                            ];
+                        }
+                        $data[] = $rowData;
+
+                    }
+                }
+            }
+
+        } else {
+            echo "Chyba: Nepodarilo sa získať údaje z AIS. HTTP kód: " . $httpCode;
+        }
+        // Uzatvorenie CURL spojenia
+        curl_close($ch);
+        return $data;
+    }
+    public function addThesis($data)
+    {
+
+    }
+    public function updateThesis($id, $data)
+    {
+
+    }
+    public function deleteThesis($id)
+    {
+
+    }
+
+    private function getAbstract($url)
+    {
+
+        // Inicializácia CURL
+        $ch = curl_init();
+
+        // Nastavenie CURL možností
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+        // If you need to set custom headers, define the $headers array with the appropriate header values
+        $headers = array(
+            'Content-Type: application/xml',
+            // Add more headers if needed
+        );
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        // Vykonanie CURL požiadavky
+        $response = curl_exec($ch);
+
+        $abstract = "";
+
+        // Kontrola HTTP kódu odpovede
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($httpCode === 200) {
+            $dom = new DOMDocument();
+            @$dom->loadHTML(mb_convert_encoding($response, 'HTML-ENTITIES', 'UTF-8'));
+
+            $table = $dom->getElementsByTagName('table')->item(0);
+            $rows = $table->getElementsByTagName('tr')->item(10);
+            $abstract = $rows->getElementsByTagName('td')->item(1)->nodeValue;
+
+
+        } else {
+            echo "Chyba: Nepodarilo sa získať údaje z AIS. HTTP kód: " . $httpCode;
+        }
+        // Uzatvorenie CURL spojenia
+        curl_close($ch);
+        return $abstract;
+    }
+
+    private function checkForFree($input)
+    {
+        $participants = explode("/", trim($input));
+        $participants[0] = trim($participants[0]);
+        $participants[1] = trim($participants[1]);
+        if ($participants[1] == "--") {
+            return true;
+        } else if ($participants[0] < $participants[1]) {
+            return true;
+        }
+        return false;
+    }
+}

@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && $_POST['formId'] == "form-record-rem
                     <a href="index.php">Rozvrh</a>
                 </li>
                 <li class="nav-item">
-                    <a href="thesis.php">Bakalárky</a>
+                    <a href="theses.php">Práce</a>
                 </li>
             </ul>
         </nav>
@@ -132,26 +132,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && $_POST['formId'] == "form-record-rem
                     <option value="-1">Všetky</option>
                 </select>
             </div>
-
-
-
-            <!-- <div class="table-selector">
-                <h4>Filter podľa roku:</h4>
-                <select name="filter-year" id="filter-year">
-                    <option value="">Vyberte rok</option>
-                    <?php
-                    // $sql = "SELECT DISTINCT year FROM prizes";
-                    // $stmt = $pdo->query($sql);
-                    
-                    // // Fetch and loop through the data to generate options
-                    // while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    //     echo "<option value='" . $row['year'] . "'>" . $row['year'] . "</option>";
-                    // }
-                    // unset($stmt);
-                    ?>
-                </select>
-            </div> -->
-
 
         </div>
         <div id="table-edit-nav" class="hidden">

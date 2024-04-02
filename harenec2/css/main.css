@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Righteous&display=swap);
+@import url('https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Righteous&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Rubik+Broken+Fax&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Anta&display=swap');
 
@@ -375,6 +375,11 @@ button:hover {
     border-radius: 5px;
 }
 
+.info-modal h2 {
+    margin: 1rem 4.5rem;
+    margin-left: 1rem;
+}
+
 .modal-data p {
     font-size: 1.7rem;
     padding: 0;
@@ -415,6 +420,11 @@ button:hover {
     border-top: 2px solid var(--webte-color-yellow);
 }
 
+.in-row {
+    display: flex;
+    flex-direction: row;
+}
+
 @media screen and (max-width:470px) {
 
     input[type=text],
@@ -436,6 +446,16 @@ button:hover {
     input[type=button],
     button {
         font-size: 1.7rem;
+    }
+
+    .info-modal h2 {
+        margin: 1rem 4.5rem;
+        margin-left: 1rem;
+        font-size: 1.7rem;
+    }
+
+    .modal-data p {
+        font-size: 1.3rem;
     }
 
 }

@@ -1,0 +1,171 @@
+openapi: 3.0.0
+info:
+  title: STU FEI Timetable & Thesis API
+  version: 1.0.0
+servers:
+  - url: http://node10.webte.fei.stuba.sk/harenec2/api/
+tags:
+  - name: timetable
+    description: About timetables in Fei Stu
+  - name: thesis
+    description: About theses in Fei Stu
+paths:
+  '/api_timetable.php/timetable':
+    get:
+      tags:
+        - timetable
+      summary: Retrieve all timetable actions
+      responses:
+        '200':
+          description: A list of all timetable actions
+          
+          
+  '/api_timetable.php/timetableAction':
+    post:
+      tags:
+        - timetable
+      summary: Add a new timetable action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimetableAction'  # Reference to the schema definition
+      responses:
+        '200':
+          description: Success message
+          
+          
+  '/api_timetable.php/timetableAction/{id}':
+    get:
+      tags:
+        - timetable
+      summary: Retrieve a timetable action by ID
+      parameters:
+        - in: path
+          name: id
+          description: ID of the timetable action
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A single timetable action
+          
+          
+    put:
+      tags:
+        - timetable
+      summary: Update a timetable action by ID
+      parameters:
+        - in: path
+          name: id
+          description: ID of the timetable action
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimetableAction'  # Reference to the schema definition
+      responses:
+        '200':
+          description: Success message
+          
+          
+    delete:
+      tags:
+        - timetable
+      summary: Delete a timetable action by ID
+      parameters:
+        - in: path
+          name: id
+          description: ID of the timetable action
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success message
+          
+          
+  '/api_thesis.php/theses/{type}/{departmentId}':
+    get:
+      tags:
+        - thesis
+      summary: Retrieve all thesis
+      parameters:
+        - in: path
+          name: type
+          description: type of thesis
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: departmentId
+          description: ID of the schools department
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A list of all thesis from certain department
+          
+  '/api_thesis.php/freeTheses/{type}/{departmentId}':
+    get:
+      tags:
+        - thesis
+      summary: Retrieve all free thesis
+      parameters:
+        - in: path
+          name: type
+          description: type of thesis
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: departmentId
+          description: ID of the schools department
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A list of all free (not taken) thesis from certain department
+          
+components:
+  schemas:
+    TimetableAction:
+      type: object
+      properties:
+        day:
+          type: string
+        time_from:
+          type: string
+          format: time
+        time_to:
+          type: string
+          format: time
+        subject:
+          type: string
+        action:
+          type: string
+        room:
+          type: string
+        teacher:
+          type: string
+      required:
+        - day
+        - time_from
+        - time_to
+        - subject
+        - action
+        - room
+        - teacher
