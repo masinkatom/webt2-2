@@ -26,7 +26,7 @@ switch ($method) {
             // Get timetable action by ID
             $taId = $matches[1];
             $ta = $timetable->getTimetableActionById($taId);
-            echo json_encode($ta);
+            echo json_encode($ta, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
     case 'POST':
@@ -34,7 +34,7 @@ switch ($method) {
             // Add new timetable Action
             $data = json_decode(file_get_contents('php://input'), true);
             $result = $timetable->addTimetableAction($data);
-            echo json_encode(['success' => $result]);
+            echo json_encode(['success' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
     case 'PUT':
@@ -43,7 +43,7 @@ switch ($method) {
             $timetableActionId = $matches[1];
             $data = json_decode(file_get_contents('php://input'), true);
             $result = $timetable->updateTimetableAction($timetableActionId, $data);
-            echo json_encode(['success' => $result]);
+            echo json_encode(['success' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
     case 'DELETE':
@@ -51,7 +51,7 @@ switch ($method) {
             // Delete timetableAction by ID
             $timetableActionId = $matches[1];
             $result = $timetable->deleteTimetableAction($timetableActionId);
-            echo json_encode(['success' => $result]);
+            echo json_encode(['success' => $result], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
         break;
 }
